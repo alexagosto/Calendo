@@ -117,7 +117,6 @@ export default function Calendar() {
                 onClick={() => handleCellSelection(currentDate.getDate() + index, currentDate.getMonth()+1, currentDate.getFullYear(), hour)}
                 >
                   {/* Each cell key is day-month-year-time */}
-                  {`${currentDate.getDate() + index}-${currentDate.getMonth()+1}-${currentDate.getFullYear()}-${hour}`}
                 </td>
               ))}
             </tr>
