@@ -1,18 +1,22 @@
+'use client'
+
 import { redirect } from 'next/navigation'
+import Calendar from './calendar/calendar';
 
-// This is a mock function. Replace it with your actual token checking logic.
-function checkToken() {
-  return  null;
-}
-
+//TODO: Fix dark mode styles, for ease of use keep everything in light mode
 export default function Home() {
-  if (!checkToken()) {
-    redirect('/login');
+  const email = sessionStorage.getItem('email');
+  const password = sessionStorage.getItem('password');
+  const name = localStorage.getItem(email + 'name');
+
+  if (localStorage.getItem(email)  == null) {
+    redirect('/auth');
   }
+  
 
   return (
-    <div className="flex justify-center items-center h-screen text-7xl">
-      Hello World, from Calendo!
+    <div className="flex flex-col items-center h-screen text-sm">
+      <Calendar />
     </div>
   );
 }
