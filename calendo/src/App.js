@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, {useState, useCallback, Fragment} from 'react';
 import './App.css';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -21,7 +21,12 @@ function App() {
     );
 
     const handleSelectEvent = useCallback(
-        event => window.alert(event.title),
+        event => {
+            const eventTitle = event.title;
+            const eventStartTime = moment(event.start).format('h:mm A');
+            const eventEndTime = moment(event.end).format('h:mm A');
+            window.alert(`Title: ${eventTitle}\nStart Time: ${eventStartTime}\nEnd Time: ${eventEndTime}`);
+        },
         []
     );
 
@@ -36,6 +41,7 @@ function App() {
                 </div>
             </header>
             <main className="main">
+                <Fragment>
                 <div className="calendar">
                     <Calendar
                         localizer={localizer}
@@ -51,6 +57,7 @@ function App() {
                         selectable
                     />
                 </div>
+                </Fragment>
             </main>
         </div>
     );

@@ -33,7 +33,6 @@
 
 .calendar {
   display: block;
-  gap: 10px;
-  margin: 20px;
-  width: 90%;
+  margin: 5px;
+  width: 100%;
 }
