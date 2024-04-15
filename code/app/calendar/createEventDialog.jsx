@@ -1,12 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-//TODO: Fix Select option styles (use native select for mobile users)
-//TODO: Add validation to the form
-//TODO: Update input sizes and styles
+//TODO: Add more validation to the form
 
 const modalVariants = {
-    opening: { opacity: 1, y: 0 },
+    opening: { opacity: 1, y: '0%' },
     hidden: { opacity: 0, y: 500 },
   };
 
@@ -31,12 +29,25 @@ const hours = Array.from({ length: 24 }, (_, index) => index);
 export default function CreateEventDialog({isOpen, day, month, year, from, to, handleDialogVisibility, handleCreateSubmit}) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [newDate, setNewDate] = useState(0);
-  const [newMonth, setNewMonth] = useState(0);
-  const [newYear, setNewYear] = useState(0);
-  const [newFrom, setNewFrom] = useState(0);
-  const [newTo, setNewTo] = useState(0);
-  const [newEvent, setNewEvent] = useState({title: '', description:'', day: 0, month: 0, year: 0, hour: 0 });
+  const [newDate, setNewDate] = useState(day);
+  const [newMonth, setNewMonth] = useState(month);
+  const [newYear, setNewYear] = useState(year);
+  const [newFrom, setNewFrom] = useState(from);
+  const [newTo, setNewTo] = useState(to);
+  const [newGroup, setNewGroup] = useState('none');
+
+  // Log the state of the dialog for development purposes
+  // TODO: Remove this useEffect hook
+  useEffect(() => {
+    if (isOpen) {
+      setNewDate(day);
+      setNewMonth(month);
+      setNewYear(year);
+      setNewFrom(from);
+      setNewTo(to);
+    }
+    console.log("createEventDialog useEffect activated!");
+  }, [isOpen, day, month, year, from, to]);
 
   if (!isOpen) {
     return null;
@@ -45,6 +56,7 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
   const handleCloseModal = () => {
     setTitle('');
     setDescription('');
+    setNewGroup('none');
     handleDialogVisibility(false);
   };
 
@@ -76,48 +88,66 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
     setNewTo(e.target.value);
   }
 
+  const handleGroupChange = (e) => {
+    setNewGroup(e.target.value);
+  }
+
   const handleSubmit = (e) => {
+    if (!isOpen) {
+      return; // Prevent form submission if the dialog is closed
+    }
     e.preventDefault();
-    setNewEvent({ title: title, description: description, day: newDate, month: newMonth, year: newYear, hour: newHour });
-    handleCreateSubmit(newEvent);
+    if (!title) {
+      alert("Please add a title!");
+      return;
+    }
+    let event = { title: title, description: description, day: newDate, month: newMonth, year: newYear, from: newFrom, to: newTo, group: newGroup};
+    handleCreateSubmit(event);
+    handleCloseModal();
   }
 
     return (
     <div className="fixed inset-0 z-30 flex items-end bg-gray-200 bg-opacity-75">
-      <AnimatePresence>
         <motion.div
           initial="hidden"
           animate="opening"
           transition={{ duration: 0.5, ease: "easeOut" }}
           variants={modalVariants}
-          exit={{ opacity: 0, y: 500 }}
-          className="bg-white rounded-lg shadow-lg p-4 w-full h-3/4"
+          className="bg-white shadow-lg p-2 w-full h-full text-lg"
         >
-          <form onSubmit={handleSubmit}>
+          <form
+          className="flex flex-col gap-2" 
+          onSubmit={handleSubmit}
+          >
+            {/* Cancel and Submit buttons */}
+            <div className="flex justify-between">
+              <button onClick={() => handleCloseModal()} 
+              className="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+              >
+                Close
+              </button>
+              <button type="submit" className="bg-blue-500 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                Save
+              </button>
+            </div>
             <div className="mb-4">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Title
-              </label>
               <input
                 type="text"
                 id="title"
                 placeholder="Event Title"
                 value={title}
                 onChange={handleTitleChange}
-                className="mt-1 block p-2 w-full rounded-md border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block p-2 w-full border-b border-gray-300 text-md"
               />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
               <textarea
                 id="description"
                 placeholder="Event Description"
                 value={description}
                 onChange={handleDescriptionChange}
-                className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 p-2 block w-full border-b border-gray-300 text-xs"
               ></textarea>
             </div>
 
@@ -127,11 +157,11 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
               </label>
               {/* Month */}
               <select
-                id="date"
+                id="month"
                 value={newMonth}
                 placeholder={month}
                 onChange={handleMonthChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 "
+                className="mt-1 block w-full border-b border-gray-300"
               >
                 {Object.keys(months).map((month) => (
                   <option key={month} value={month}>
@@ -147,11 +177,11 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
               </label>
               {/* Day */}
               <select
-                id="date"
+                id="day"
                 value={newDate}
                 placeholder={day}
                 onChange={handleDayChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full border-b border-gray-300"
               >
                 {days.map((day) => (
                   <option key={day} value={day}>
@@ -167,11 +197,11 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
               </label>
               {/* Year */}
               <select
-                id="date"
+                id="year"
                 placeholder={year}
                 value={newYear}
                 onChange={handleYearChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full border-b border-gray-300"
               >
                 {years.map((year) => (
                   <option key={year} value={year}>
@@ -186,11 +216,11 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
                 From:
               </label>
               <select
-                id="time"
+                id="from"
                 placeholder={from}
                 value={newFrom}
                 onChange={handleFromChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full border-b border-gray-300"
               >
                 {hours.map((hour) => (
                   <option key={hour} value={hour}>
@@ -205,11 +235,11 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
                 To:
               </label>
               <select
-                id="time"
-                placeholder={to}
+                id="to"
+                placeholder={`${to}:00`}
                 value={newTo}
                 onChange={handleToChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full border-b border-gray-300"
               >
                 {hours.map((hour) => (
                   <option key={hour} value={hour}>
@@ -219,19 +249,22 @@ export default function CreateEventDialog({isOpen, day, month, year, from, to, h
               </select>
             </div>
 
-            <div className="flex justify-between">
-              <button onClick={() => handleCloseModal()} 
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+            <div className="mb-4">
+              <label htmlFor="time" className="block text-sm font-medium text-gray-700">
+                Group:
+              </label>
+              <select
+                id="to"
+                value={newGroup}
+                onChange={handleGroupChange}
+                className="mt-1 block w-full border-b border-gray-300"
               >
-                Close
-              </button>
-              <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
-                Create Event
-              </button>
+                <option value="none">None</option>
+                <option value="Group 1">Group 1</option>
+              </select>
             </div>
           </form>
         </motion.div>
-      </AnimatePresence>
     </div>
     );
   }

@@ -3,8 +3,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import CreateEventDialog from './createEventDialog';
+import { FaUserGroup } from "react-icons/fa6";
+import { FaUser } from "react-icons/fa";
 
 //TODO: Add the ability to add events to the calendar
+    //
+    //TODO: render multiple hour events
 //TODO: Add the ability to view events on the calendar
 //TODO: Add the ability to edit events on the calendar
 //TODO: Add the ability to delete events on the calendar
@@ -45,7 +49,7 @@ export default function Calendar() {
     setSelectedYear(year);
     setSelectedHour(hour);
     setCreateDialogOpen(true);
-    console.log(selectedDate, selectedMonth, selectedYear, selectedHour, createDialogOpen);
+    console.log("Selected cell:", selectedDate, selectedMonth, selectedYear, selectedHour);
   };
 
   // Function to handle the visibility of the create event dialog
@@ -107,16 +111,46 @@ export default function Calendar() {
         <tbody>
           {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
             <tr key={hour}>
-              <td className="bg-gray-100 text-center p-4 w-4 border">
+              <td className="bg-gray-100 text-center px-4 pb-4 w-4 border">
                 <div className="text-gray-700 font-semibold">{hour}:00</div>
               </td>
               {[0, 1, 2].map((index) => (
                 <td 
                 key={`${currentDate.getDate() + index}-${currentDate.getMonth()+1}-${currentDate.getFullYear()}-${hour}`} 
-                className="border text-center p-4"
+                className="border text-center relative"
                 onClick={() => handleCellSelection(currentDate.getDate() + index, currentDate.getMonth()+1, currentDate.getFullYear(), hour)}
                 >
                   {/* Each cell key is day-month-year-time */}
+                  {events.map((event) => {
+                    if (
+                      event.day === currentDate.getDate() + index &&
+                      event.month === currentDate.getMonth()+1 &&
+                      event.year === currentDate.getFullYear() &&
+                      event.from === hour
+                  ) {
+                    // Calculate the width of the event div based on the duration
+                      const eventHeight = `${(event.to - event.from) * 100}%`;
+                      return (
+                        <div 
+                        key={event.title} 
+                        className="absolute flex flex-col top-0 left-1 bg-orange-300 text-white p-1 rounded-lg w-[90%] text-start"
+                        style={{ height: eventHeight }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log("Event clicked:", event);
+                          handleEventEdit(event);
+                        }}
+                        >
+                          <div className="flex flex-row font-bold">
+                          {event.group != 'none' ? <FaUserGroup /> : <FaUser />}
+                          </div>
+                          <div className='overflow-hidden'>{event.title}</div>
+                        </div>
+                      );
+                    }
+                  }
+                  )}
+                  
                 </td>
               ))}
             </tr>
@@ -127,7 +161,8 @@ export default function Calendar() {
           day={selectedDate} 
           month={selectedMonth} 
           year={selectedYear} 
-          hour={selectedHour}
+          from={selectedHour}
+          to={selectedHour + 1}
           isOpen={createDialogOpen}
           handleDialogVisibility={handleDialogVisibility}
           handleCreateSubmit={handleCreateSubmit}
