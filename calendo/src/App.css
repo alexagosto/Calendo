@@ -1,0 +1,39 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+}
+
+.icons {
+  display: flex;
+}
+
+.menu-icon,
+.notification-icon,
+.profile-icon {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.main {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+
+.calendar {
+  display: block;
+  gap: 10px;
+  margin: 20px;
+  width: 90%;
+}
