@@ -6,13 +6,6 @@ import CreateEventDialog from "./createEventDialog";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa";
 
-//TODO: Add the ability to view/edit/delete events on the calendar
-
-//TODO: Add and smooth out calendar swiping animations
-//TODO: Fix, more touch friendly navigation buttons
-//TODO: Add the ability to navigate to a specific month
-//TODO: Implement more touch controls for mobile users
-
 export default function Calendar() {
   // State for the current date
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -30,8 +23,8 @@ export default function Calendar() {
       new Date(
         currentDate.getFullYear(),
         currentDate.getMonth(),
-        currentDate.getDate() - 3,
-      ),
+        currentDate.getDate() - 3
+      )
     );
     setDateStyle("hiddenLeft");
   };
@@ -42,8 +35,8 @@ export default function Calendar() {
       new Date(
         currentDate.getFullYear(),
         currentDate.getMonth(),
-        currentDate.getDate() + 3,
-      ),
+        currentDate.getDate() + 3
+      )
     );
     setDateStyle("hiddenRight");
   };
@@ -60,7 +53,7 @@ export default function Calendar() {
       selectedDate,
       selectedMonth,
       selectedYear,
-      selectedHour,
+      selectedHour
     );
   };
 
@@ -139,14 +132,16 @@ export default function Calendar() {
               </td>
               {[0, 1, 2].map((index) => (
                 <td
-                  key={`${currentDate.getDate() + index}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}-${hour}`}
+                  key={`${currentDate.getDate() + index}-${
+                    currentDate.getMonth() + 1
+                  }-${currentDate.getFullYear()}-${hour}`}
                   className="border text-center relative"
                   onClick={() =>
                     handleCellSelection(
                       currentDate.getDate() + index,
                       currentDate.getMonth() + 1,
                       currentDate.getFullYear(),
-                      hour,
+                      hour
                     )
                   }
                 >
@@ -167,12 +162,11 @@ export default function Calendar() {
                           style={{ height: eventHeight }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log("Event clicked:", event);
                             handleEventEdit(event);
                           }}
                         >
                           <div className="flex flex-row font-bold">
-                            {event.group != "none" ? (
+                            {event.people.length > 0 ? (
                               <FaUserGroup />
                             ) : (
                               <FaUser />
